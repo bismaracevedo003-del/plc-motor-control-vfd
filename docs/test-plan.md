@@ -37,6 +37,13 @@ python -m unittest discover -s simulation/tests -v
 - Motor current measurement with a real clamp meter.
 - E-stop category verification by a qualified electrician.
 
-## 5. Nota (ES)
+## 5. Ejecución real
+
+```text
+Ran 25 tests in 0.555s
+OK
+```
+
+## 6. Nota (ES)
 
 Todos los casos automatizados pasan en simulador. Los pendientes requieren hardware y no se presentan como resultados obtenidos.

@@ -101,7 +101,7 @@ python simulation/motor_simulator.py --duration 40 --setpoint 35
 python -m unittest discover -s simulation/tests -v
 ```
 
-Covers 4-20 mA scaling, ramp math, start permissive, overload trip, fault reset rules, deceleration, current model, HMI tag contract and REST endpoints. Results: see [docs/test-plan.md](docs/test-plan.md).
+Covers 4-20 mA scaling, ramp math, start permissive, overload trip, fault reset rules, deceleration, current model, HMI tag contract and REST endpoints. Result: `Ran 25 tests ... OK`. See [docs/test-plan.md](docs/test-plan.md).
 
 ## 11. Evidence matrix
 
