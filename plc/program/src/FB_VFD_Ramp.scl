@@ -1,0 +1,36 @@
+FUNCTION_BLOCK "FB_VFD_Ramp"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Enable : BOOL;
+    Setpoint : REAL;
+    AccelRate : REAL;
+    DecelRate : REAL;
+END_VAR
+VAR_IN_OUT
+    Actual : REAL;
+END_VAR
+VAR_OUTPUT
+    Done : BOOL;
+END_VAR
+VAR
+    target : REAL;
+    step : REAL;
+END_VAR
+BEGIN
+    IF Enable THEN
+        target := LIMIT(MIN := 0.0, IN := Setpoint, MAX := 50.0);
+    ELSE
+        target := 0.0;
+    END_IF;
+
+    IF Actual < target THEN
+        step := AccelRate * 0.1;
+        Actual := LIMIT(MIN := 0.0, IN := Actual + step, MAX := target);
+    ELSIF Actual > target THEN
+        step := DecelRate * 0.1;
+        Actual := LIMIT(MIN := target, IN := Actual - step, MAX := 50.0);
+    END_IF;
+
+    Done := ABS(Actual - target) <= 0.5;
+END_FUNCTION_BLOCK

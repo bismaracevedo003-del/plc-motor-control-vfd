@@ -1,0 +1,51 @@
+FUNCTION_BLOCK "FB_MotorFaults"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    EStopOK : BOOL;
+    OverloadOK : BOOL;
+    VFDReady : BOOL;
+    TempOK : BOOL;
+    RunRequest : BOOL;
+    OvercurrentTimed : BOOL;
+    ResetCmd : BOOL;
+END_VAR
+VAR_OUTPUT
+    FaultCode : INT;
+    FaultLatched : BOOL;
+END_VAR
+VAR
+    newCode : INT;
+    resetPrev : BOOL;
+    resetEdge : BOOL;
+END_VAR
+BEGIN
+    newCode := 0;
+    IF NOT EStopOK THEN
+        newCode := 5;
+    END_IF;
+    IF NOT OverloadOK THEN
+        newCode := 1;
+    END_IF;
+    IF NOT TempOK THEN
+        newCode := 4;
+    END_IF;
+    IF (NOT VFDReady) AND RunRequest THEN
+        newCode := 2;
+    END_IF;
+    IF OvercurrentTimed THEN
+        newCode := 3;
+    END_IF;
+
+    IF newCode <> 0 THEN
+        FaultCode := newCode;
+        FaultLatched := TRUE;
+    END_IF;
+
+    resetEdge := ResetCmd AND NOT resetPrev;
+    resetPrev := ResetCmd;
+    IF resetEdge AND (newCode = 0) THEN
+        FaultCode := 0;
+        FaultLatched := FALSE;
+    END_IF;
+END_FUNCTION_BLOCK

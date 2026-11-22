@@ -1,0 +1,41 @@
+DATA_BLOCK "Scale_Speed"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"FB_AI_Scale"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "Scale_Current"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"FB_AI_Scale"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "Faults_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"FB_MotorFaults"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "MotorCtrl_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"FB_MotorControl"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "Ramp_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"FB_VFD_Ramp"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "OvercurrentTimer"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TON_TIME"
+BEGIN
+END_DATA_BLOCK

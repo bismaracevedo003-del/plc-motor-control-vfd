@@ -1,0 +1,27 @@
+DATA_BLOCK "DB20"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+NON_RETAIN
+VAR
+    StartCmd : BOOL;
+    StopCmd : BOOL;
+    ResetCmd : BOOL;
+    RemoteMode : BOOL := TRUE;
+    SpeedSetpoint_Hz : REAL := 30.0;
+    ActualFrequency_Hz : REAL;
+    MotorCurrent_A : REAL;
+    State : INT;
+    FaultCode : INT;
+    FaultLatched : BOOL;
+    RunOutput : BOOL;
+    VFDReady : BOOL;
+    OverloadOK : BOOL;
+    EStopOK : BOOL;
+    AccelRate_Hz_s : REAL := 5.0;
+    DecelRate_Hz_s : REAL := 7.0;
+    RatedCurrent_A : REAL := 6.0;
+    Runtime_s : DINT;
+    StartCount : INT;
+END_VAR
+BEGIN
+END_DATA_BLOCK

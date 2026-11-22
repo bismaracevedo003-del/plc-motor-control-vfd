@@ -1,0 +1,44 @@
+ORGANIZATION_BLOCK "OB1"
+TITLE = "Main"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_TEMP
+    potHz : REAL;
+    setpoint : REAL;
+    interlocksOK : BOOL;
+    rampEnable : BOOL;
+    atTarget : BOOL;
+    overcurrent : BOOL;
+END_VAR
+BEGIN
+    "Scale_Speed"(Raw := "IW64", EuMin := 0.0, EuMax := 50.0, Value => #potHz);
+    "Scale_Current"(Raw := "IW66", EuMin := 0.0, EuMax := 10.0, Value => "DB20".MotorCurrent_A);
+
+    IF "DB20".RemoteMode THEN
+        #setpoint := "DB20".SpeedSetpoint_Hz;
+    ELSE
+        #setpoint := #potHz;
+        "DB20".SpeedSetpoint_Hz := #potHz;
+    END_IF;
+
+    #interlocksOK := "I0.0" AND "I0.1" AND "I0.2" AND "I0.3";
+    #overcurrent := "DB20".MotorCurrent_A > ("DB20".RatedCurrent_A * 1.5);
+    "OvercurrentTimer"(IN := #overcurrent, PT := T#2s);
+
+    "DB20".EStopOK := "I0.0";
+    "DB20".OverloadOK := "I0.1";
+    "DB20".VFDReady := "I0.2";
+
+    "Faults_DB"(EStopOK := "I0.0", OverloadOK := "I0.1", VFDReady := "I0.2", TempOK := "I0.3", RunRequest := "Q0.0", OvercurrentTimed := "OvercurrentTimer".Q, ResetCmd := "DB20".ResetCmd, FaultCode := "DB20".FaultCode, FaultLatched := "DB20".FaultLatched);
+
+    "MotorCtrl_DB"(StartCmd := "DB20".StartCmd, StopCmd := "DB20".StopCmd, RemoteMode := "DB20".RemoteMode, LocalStart := "I0.5", LocalStop := "I0.6", FaultCode := "DB20".FaultCode, InterlocksOK := #interlocksOK, Setpoint := #setpoint, ActualFrequency := "DB20".ActualFrequency_Hz, AtTarget := #atTarget, Runtime := "DB20".Runtime_s, StartCount := "DB20".StartCount, RunOutput := "DB20".RunOutput, RampEnable := #rampEnable, State := "DB20".State);
+
+    "Ramp_DB"(Enable := #rampEnable, Setpoint := #setpoint, AccelRate := "DB20".AccelRate_Hz_s, DecelRate := "DB20".DecelRate_Hz_s, Actual := "DB20".ActualFrequency_Hz, Done := #atTarget);
+
+    "Q0.0" := "DB20".RunOutput;
+    "Q0.1" := "DB20".ResetCmd;
+    "Q0.2" := ("DB20".State = 1) OR ("DB20".State = 2);
+    "Q0.3" := "DB20".FaultLatched;
+    "Q0.4" := "DB20".FaultLatched;
+    "QW80" := INT_TO_WORD(REAL_TO_INT(5530.0 + ("DB20".ActualFrequency_Hz / 50.0) * 22118.0));
+END_ORGANIZATION_BLOCK

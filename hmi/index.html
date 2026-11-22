@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Motor Control · VFD HMI</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <span>PLC · MOTOR CONTROL</span>
+        <h1>VFD Motor Station</h1>
+        <p>S7-1200 control strategy · 4 kW induction motor · local/remote operation</p>
+      </header>
+
+      <section class="cards">
+        <article><label>State</label><strong id="state">--</strong></article>
+        <article><label>Frequency</label><strong><span id="frequency">--</span> <small>Hz</small></strong></article>
+        <article><label>Current</label><strong><span id="current">--</span> <small>A</small></strong></article>
+        <article><label>Fault</label><strong id="fault">--</strong></article>
+      </section>
+
+      <section class="panel">
+        <h2>Operator commands</h2>
+        <div class="buttons">
+          <button id="start">START</button>
+          <button id="stop">STOP</button>
+          <button id="reset">RESET FAULT</button>
+        </div>
+        <label class="slider-label">Speed setpoint <span id="setpoint-value">30</span> Hz</label>
+        <input id="setpoint" type="range" min="0" max="50" step="1" value="30" />
+        <p>Ramp: <span id="ramps">--</span></p>
+      </section>
+
+      <section class="panel">
+        <h2>Fault simulation</h2>
+        <div class="buttons">
+          <button data-fault="overload">Overload</button>
+          <button data-fault="vfd_fault">VFD fault</button>
+          <button data-fault="cooling">Cooling</button>
+          <button data-fault="e_stop">E-stop</button>
+        </div>
+        <p class="note">Synthetic faults and values · no physical motor connected.</p>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

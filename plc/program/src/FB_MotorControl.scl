@@ -1,0 +1,67 @@
+FUNCTION_BLOCK "FB_MotorControl"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    StartCmd : BOOL;
+    StopCmd : BOOL;
+    RemoteMode : BOOL;
+    LocalStart : BOOL;
+    LocalStop : BOOL;
+    FaultCode : INT;
+    InterlocksOK : BOOL;
+    Setpoint : REAL;
+    ActualFrequency : REAL;
+    AtTarget : BOOL;
+END_VAR
+VAR_IN_OUT
+    Runtime : DINT;
+    StartCount : INT;
+END_VAR
+VAR_OUTPUT
+    RunOutput : BOOL;
+    RampEnable : BOOL;
+    State : INT;
+END_VAR
+VAR
+    startReq : BOOL;
+    stopReq : BOOL;
+    startPrev : BOOL;
+    startEdge : BOOL;
+END_VAR
+BEGIN
+    startReq := (RemoteMode AND StartCmd) OR ((NOT RemoteMode) AND LocalStart);
+    stopReq := (RemoteMode AND StopCmd) OR ((NOT RemoteMode) AND NOT LocalStop);
+    startEdge := startReq AND NOT startPrev;
+    startPrev := startReq;
+
+    IF FaultCode <> 0 THEN
+        State := 4;
+        RunOutput := FALSE;
+        RampEnable := FALSE;
+    ELSIF State = 4 THEN
+        State := 0;
+        RunOutput := FALSE;
+        RampEnable := FALSE;
+    ELSIF stopReq AND (State = 1 OR State = 2) THEN
+        State := 3;
+        RampEnable := TRUE;
+    ELSIF State = 3 THEN
+        RampEnable := TRUE;
+        IF ActualFrequency <= 0.5 THEN
+            State := 0;
+            RunOutput := FALSE;
+            RampEnable := FALSE;
+        END_IF;
+    ELSIF startEdge AND (State = 0) AND InterlocksOK AND (Setpoint > 0.0) THEN
+        State := 1;
+        RunOutput := TRUE;
+        RampEnable := TRUE;
+        StartCount := StartCount + 1;
+    ELSIF State = 1 AND AtTarget THEN
+        State := 2;
+    END_IF;
+
+    IF RunOutput THEN
+        Runtime := Runtime + 1;
+    END_IF;
+END_FUNCTION_BLOCK
