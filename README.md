@@ -133,6 +133,10 @@ Covers 4-20 mA scaling, ramp math, start permissive, overload trip, fault reset 
 - [x] Complete README (technical English + Spanish notes)
 - [x] Repository initialized on `main`
 
+## 14. Optional real-mode adapter
+
+`MODE=simulation` remains the default and the existing server/tests are unchanged. An optional S7 adapter (`simulation/real_adapter.py`) can be selected with `MODE=real` and the `S7_*` environment variables, or with `--source real` once `MODE=real` is set. It is read-only unless `ALLOW_WRITES=true`, never falls back silently, and uses optional dependencies listed in `requirements-real.txt`. See [docs/real-integration.md](docs/real-integration.md) and [config/real.env.example](config/real.env.example).
+
 ---
 
 **Author:** Bismarck Acevedo — Electronic Engineer, Industrial Automation & PLC Programming.

@@ -1,0 +1,3 @@
+# Optional dependencies for MODE=real only (not needed for simulation/tests).
+python-snap7>=1.2
+python-dotenv>=1.0

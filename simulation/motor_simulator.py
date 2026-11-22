@@ -9,6 +9,8 @@ import argparse
 import json
 from typing import Any
 
+from real_adapter import create_drive_source
+
 STOPPED = 0
 STARTING = 1
 RUNNING = 2
@@ -242,20 +244,28 @@ class MotorDrive:
         }
 
 
-def run_demo(duration_s: int, setpoint_hz: float, interval: int) -> None:
-    drive = MotorDrive()
-    drive.setpoint_hz = setpoint_hz
-    drive.command("START")
-    for second in range(1, duration_s + 1):
-        snapshot = drive.tick(1.0)
-        if second == 2:
-            drive.release("START")
-        if second == 20:
-            drive.command("STOP")
-        if second == 22:
-            drive.release("STOP")
-        if second % interval == 0 or second == 1:
-            print(json.dumps(snapshot, sort_keys=True))
+def run_demo(duration_s: int, setpoint_hz: float, interval: int, source: str | None = None) -> None:
+    drive = create_drive_source(source=source)
+    close = getattr(drive, 'close', None)
+    real = close is not None
+    if not real:
+        drive.setpoint_hz = setpoint_hz
+        drive.command("START")
+    try:
+        for second in range(1, duration_s + 1):
+            snapshot = drive.tick(1.0)
+            if not real:
+                if second == 2:
+                    drive.release("START")
+                if second == 20:
+                    drive.command("STOP")
+                if second == 22:
+                    drive.release("STOP")
+            if second % interval == 0 or second == 1:
+                print(json.dumps(snapshot, sort_keys=True))
+    finally:
+        if real:
+            close()
 
 
 def main() -> None:
@@ -263,8 +273,12 @@ def main() -> None:
     parser.add_argument("--duration", type=int, default=40)
     parser.add_argument("--setpoint", type=float, default=35.0)
     parser.add_argument("--interval", type=int, default=2)
+    parser.add_argument(
+        "--source", choices=("simulation", "real"), default=None,
+        help="data source; 'real' requires MODE=real and the S7_* configuration",
+    )
     args = parser.parse_args()
-    run_demo(args.duration, args.setpoint, args.interval)
+    run_demo(args.duration, args.setpoint, args.interval, args.source)
 
 
 if __name__ == "__main__":
